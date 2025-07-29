@@ -16,7 +16,14 @@ async def _analyze(
     optional_email_rep: clients.EmailRep | None = None,
     optional_inquest: clients.InQuest | None = None,
     optional_vt: clients.VirusTotal | None = None,
-    optional_urlscan: clients.UrlScan | None = None,
+    optional_urlscan: clients.UrlScan | None = None,    
+    #Start of added code including the clients of openai and copilot    
+    optional_openai: clients.openai | None = None,
+    optional_copilot: clients.copilot | None = None,
+    #End of added code including the clients of openai and copilot
+    
+    
+    
 ) -> schemas.Response:
     try:
         payload = schemas.FilePayload(file=file)
