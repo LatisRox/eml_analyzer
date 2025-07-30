@@ -3,15 +3,15 @@ services:
     image: instantlinux/spamassassin:4.0.0-6
     platform: linux/x86_64
     ports:
-      - ${SPAMASSASSIN_PORT:-783}:783
+      - ${SPAMASSASSIN_PORT:-784}:783
     restart: always
 
   redis:
     image: "redis/redis-stack:7.2.0-v8"
     restart: always
     ports:
-      - ${REDIS_PORT:-6379}:6379
-      - ${REDIS_INSIGHT_PORT:-8001}:8001
+      - ${REDIS_PORT:-6380}:6379
+      - ${REDIS_INSIGHT_PORT:-8002}:8001
     volumes:
       - redis-data:/data
 
@@ -20,7 +20,7 @@ services:
       context: ./
       dockerfile: app.Dockerfile
     ports:
-      - ${PORT:-9010}:8000
+      - ${PORT:-9001}:8000
     environment:
       - SPAMASSASSIN_HOST=spamassassin
       - SPAMASSASSIN_PORT=${SPAMASSASSIN_PORT:-783}
