@@ -18,17 +18,17 @@ const status = computed(() => store.$state)
 </script>
 
 <template>
-  <div class="box">
-    <div class="block">
-      <h2 class="is-size-4 has-text-weight-bold middle">ID</h2>
-      <article class="message is-info">
-        <div class="message-body">
-          <router-link :to="{ name: 'Lookup', params: { id: response.id } }" v-if="status.cache">{{
+  <div class="grid gap-4">
+    <div class="grid gap-4" v-if="status.cache">
+      <h2 class="text-2xl font-bold middle">Cache</h2>
+      <div class="card border-1 border-info">
+        <div class="card-body">
+          <h3 class="card-title text-base">ID</h3>
+          <router-link :to="{ name: 'Lookup', params: { id: response.id } }">{{
             response.id
           }}</router-link>
-          <p v-else>{{ response.id }}</p>
         </div>
-      </article>
+      </div>
     </div>
     <Verdicts :verdicts="response.verdicts" v-if="response.verdicts.length > 0" />
     <Eml :eml="response.eml" />
