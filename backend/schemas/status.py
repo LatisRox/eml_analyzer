@@ -17,3 +17,14 @@ class Status(APIModel):
     email_rep: bool = Field(
         default=False, description="Whether EmailRep integration is enabled or not"
     )
+    #Start of added code
+    openai: bool = Field(
+        default=False, description="Whether Openai integration is enabled or not"
+    )
+    #copilot: bool = Field(
+    #    default=False, description="Whether copilot integration is enabled or not"
+    #)
+    #anyrun: bool = Field(
+    #    default=False, description="Whether anyrun integration is enabled or not"
+    #)
+    #End of added code

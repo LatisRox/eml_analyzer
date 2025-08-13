@@ -39,6 +39,11 @@ URLSCAN_API_KEY: Secret | None = config("URLSCAN_API_KEY", cast=Secret, default=
 EMAIL_REP_API_KEY: Secret | None = config(
     "EMAIL_REP_API_KEY", cast=Secret, default=None
 )
+#start of added code
+OPENAI_API_KEY: Secret | None = config("OPENAI_API_KEY", cast=Secret, default=None)
+#COPILOT_API_KEY: Secret | None = config("COPILOT_API_KEY", cast=Secret, default=None)
+#ANYRUN_API_KEY: Secret | None = config("ANYRUN_API_KEY", cast=Secret, default=None)
+#end of added code
 
 # Async/aiometer
 ASYNC_MAX_AT_ONCE: int | None = config("ASYNC_MAX_AT_ONCE", cast=int, default=None)

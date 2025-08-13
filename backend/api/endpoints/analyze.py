@@ -17,6 +17,15 @@ async def _analyze(
     optional_inquest: clients.InQuest | None = None,
     optional_vt: clients.VirusTotal | None = None,
     optional_urlscan: clients.UrlScan | None = None,
+    #added code starts here
+    optional_openai: clients.Openai | None = None,
+    #optional_copilot: clients.copilot | None = None, 
+    #optional_anyrun: clients.anyrun | None = None,   
+    #added code ends here  
+
+    
+    
+    
 ) -> schemas.Response:
     try:
         payload = schemas.FilePayload(file=file)
@@ -33,6 +42,11 @@ async def _analyze(
         optional_inquest=optional_inquest,
         optional_urlscan=optional_urlscan,
         optional_vt=optional_vt,
+        #added code starts here
+        optional_openai=optional_openai,
+        #optional_copilot=optional_copilot,
+        #optional_anyrun=optional_anyrun,
+        #added code ends here
     )
 
 
@@ -62,6 +76,11 @@ async def analyze(
     optional_inquest: dependencies.OptionalInQuest,
     optional_vt: dependencies.OptionalVirusTotal,
     optional_urlscan: dependencies.OptionalUrlScan,
+    #added code starts here
+    optional_openai: dependencies.OptionalOpenai,
+    #optional_copilot: dependencies.OptionalCopilot,
+    #optional_anyrun: dependencies.OptionalAnyrun,
+    #added code ends here
 ) -> schemas.Response:
     response = await _analyze(
         payload.file.encode(),
@@ -70,6 +89,11 @@ async def analyze(
         optional_inquest=optional_inquest,
         optional_urlscan=optional_urlscan,
         optional_vt=optional_vt,
+        #added code starts here
+        optional_openai=optional_openai,
+        #optional_copilot=optional_copilot,
+        #optional_anyrun=optional_anyrun,
+        #added code starts here
     )
 
     if optional_redis is not None:
@@ -96,6 +120,11 @@ async def analyze_file(
     optional_inquest: dependencies.OptionalInQuest,
     optional_vt: dependencies.OptionalVirusTotal,
     optional_urlscan: dependencies.OptionalUrlScan,
+    #added code starts here
+    optional_openai: dependencies.OptionalOpenai,
+    #optional_copilot: dependencies.OptionalCopilot,
+    #optional_anyrun: dependencies.OptionalAnyrun,
+    #added code starts here
 ) -> schemas.Response:
     response = await _analyze(
         file,
@@ -104,6 +133,11 @@ async def analyze_file(
         optional_inquest=optional_inquest,
         optional_urlscan=optional_urlscan,
         optional_vt=optional_vt,
+        #added code starts here
+        optional_openai=optional_openai,
+        #optional_copilot=optional_copilot,
+        #optional_anyrun=optional_anyrun,
+        #added code starts here
     )
 
     if optional_redis is not None:

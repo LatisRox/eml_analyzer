@@ -50,6 +50,35 @@ async def _get_optional_inquest(api_key: Secret | None = settings.INQUEST_API_KE
         async with clients.InQuest(api_key=api_key) as client:
             yield client
 
+#Start of added code
+@asynccontextmanager
+async def _get_optional_openai(api_key: Secret | None = settings.OPENAI_API_KEY):
+    if api_key is None:
+        yield None
+    else:
+        async with clients.Openai(api_key=api_key) as client:
+            yield client
+
+async def get_optional_openai():
+    async with _get_optional_openai(settings.OPENAI_API_KEY) as client:
+        yield client
+
+#@asynccontextmanager
+#async def _get_optional_copilot(api_key: Secret | None = settings.COPILOT_API_KEY):
+#    if api_key is None:
+#        yield None
+#    else:
+#        async with clients.Copilot(api_key=api_key) as client:
+#            yield client
+
+#@asynccontextmanager
+#async def _get_optional_anyrun(api_key: Secret | None = settings.ANYRUN_API_KEY):
+#    if api_key is None:
+#        yield None
+#    else:
+#        async with clients.Anyrun(api_key=api_key) as client:
+#            yield client
+#End of added code
 
 async def get_optional_inquest():
     async with _get_optional_inquest(settings.INQUEST_API_KEY) as client:
@@ -103,6 +132,12 @@ OptionalVirusTotal = typing.Annotated[
 OptionalUrlScan = typing.Annotated[
     clients.UrlScan | None, Depends(get_optional_urlscan)
 ]
+
+#Start of added code
+OptionalOpenai = typing.Annotated[
+    clients.Openai | None, Depends(get_optional_openai)
+]
+#End of added code
 
 OptionalEmailRep = typing.Annotated[clients.EmailRep, Depends(get_optional_email_rep)]
 SpamAssassin = typing.Annotated[clients.SpamAssassin, Depends(get_spam_assassin)]

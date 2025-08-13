@@ -12,6 +12,11 @@ async def get_status(
     optional_inquest: dependencies.OptionalInQuest,
     optional_vt: dependencies.OptionalVirusTotal,
     optional_urlscan: dependencies.OptionalUrlScan,
+    #Start of added code
+    optional_openai: dependencies.OptionalOpenai,
+    #optional_copilot: dependencies.OptionalCopilot,
+    #optional_anyrun: dependencies.OptionalAnyrun,
+    #End of added code
 ) -> schemas.Status:
     return schemas.Status(
         cache=optional_redis is not None,
@@ -19,4 +24,9 @@ async def get_status(
         inquest=optional_inquest is not None,
         email_rep=optional_email_rep is not None,
         urlscan=optional_urlscan is not None,
+        #Start of added code
+        openai=optional_openai is not None,
+        #copilot=optional_copilot is not None,
+        #anyrun=optional_anyrun is not None,
+        #End of added code
     )

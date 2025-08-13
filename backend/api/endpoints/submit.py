@@ -2,8 +2,16 @@ import httpx
 from fastapi import APIRouter, HTTPException, status
 
 from backend import dependencies, schemas
-from backend.schemas.eml import Attachment
+#added body and header to original
+from backend.schemas.eml import Attachment, Body, Header
+#Start of added code
+from backend.schemas.openai_chat import ChatPrompt, ChatResponse
+from backend.dependencies import OptionalOpenai
+#Endo of added code
 from backend.utils import attachment_to_file
+from dotenv import load_dotenv
+from openai import OpenAI
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -68,3 +76,45 @@ async def submit_to_virustotal(
             status_code=e.response.status_code,
             detail=f"Something went wrong with VirusTotal submission: {e}",
         ) from e
+    
+#Start of added code
+@router.post(
+    "/chatgpt",
+    response_model=ChatResponse,
+    response_description="Return a ChatGPT response",
+    summary="Send a custom prompt to ChatGPT",
+    description="Send a prompt to the OpenAI ChatGPT API and get the response",
+    status_code=status.HTTP_200_OK,
+)
+async def send_to_chatgpt(
+    body: Body,
+    header: Header,
+    optional_openai: OptionalOpenai  # ✅ dependency injection
+):
+    if optional_openai is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have the OpenAI API key",
+        )
+
+    try:
+        # Get the static base prompt from the schema
+        base_prompt = ChatPrompt().prompt
+
+        # Build the full prompt with header + body
+        full_prompt = f"{base_prompt}\nHeader: {header.header}\nBody: {body.content}"
+
+        # Send to OpenAI
+        reply = await optional_openai.send_prompt(
+            prompt=full_prompt,
+            model="gpt-3.5-turbo"
+        )
+
+        return ChatResponse(response=reply)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error communicating with ChatGPT: {str(e)}"
+        ) 
+#Start of added code
