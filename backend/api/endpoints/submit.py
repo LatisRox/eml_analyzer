@@ -90,7 +90,7 @@ async def send_to_chatgpt(
     body: Body,
     header: Header,
     optional_openai: OptionalOpenai  # ✅ dependency injection
-):
+)-> schemas.SubmissionResult:
     if optional_openai is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -102,7 +102,8 @@ async def send_to_chatgpt(
         base_prompt = ChatPrompt().prompt
 
         # Build the full prompt with header + body
-        full_prompt = f"{base_prompt}\nHeader: {header.header}\nBody: {body.content}"
+        full_prompt = f"{base_prompt}\nHeader: {str(header.header)}\nBody: {body.content}"
+        print(full_prompt)
 
         # Send to OpenAI
         reply = await optional_openai.send_prompt(
