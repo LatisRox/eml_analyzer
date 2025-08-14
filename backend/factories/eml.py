@@ -130,6 +130,8 @@ def normalize_header(parsed: dict) -> dict:
     received = header.get("received", [])
     header["received"] = _normalize_received(received)
     parsed["header"] = header
+    #print debug
+    print("normalize_header"+str(parsed))
     return parsed
 
 
@@ -152,6 +154,8 @@ def normalize_bodies(parsed: dict) -> dict:
     bodies = parsed.get("body", [])
     parsed["bodies"] = [_normalize_body(body) for body in bodies]
     parsed.pop("body", None)
+    #print debug
+    print("normalize_bodies"+str(parsed))
     return parsed
 
 
