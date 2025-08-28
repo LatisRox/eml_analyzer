@@ -2,16 +2,10 @@ import httpx
 from fastapi import APIRouter, HTTPException, status
 
 from backend import dependencies, schemas
-#added body and header to original
-from backend.schemas.eml import Attachment, Body, Header
-#Start of added code
-from backend.schemas.openai_chat import ChatPrompt, ChatResponse
 from backend.dependencies import OptionalOpenai
-#Endo of added code
+from backend.schemas.eml import Attachment, Body, Header
+from backend.schemas.openai_chat import ChatPrompt, ChatResponse
 from backend.utils import attachment_to_file
-from dotenv import load_dotenv
-from openai import OpenAI
-from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -76,8 +70,9 @@ async def submit_to_virustotal(
             status_code=e.response.status_code,
             detail=f"Something went wrong with VirusTotal submission: {e}",
         ) from e
-    
-#Start of added code
+
+
+# Added ChatGPT endpoint for sending custom prompts
 @router.post(
     "/chatgpt",
     response_model=ChatResponse,
@@ -87,10 +82,11 @@ async def submit_to_virustotal(
     status_code=status.HTTP_200_OK,
 )
 async def send_to_chatgpt(
-    body: Body,
     header: Header,
-    optional_openai: OptionalOpenai  # ✅ dependency injection
-)-> schemas.SubmissionResult:
+    body: Body,
+    prompt: ChatPrompt,
+    optional_openai: OptionalOpenai,
+) -> ChatResponse:
     if optional_openai is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -98,24 +94,16 @@ async def send_to_chatgpt(
         )
 
     try:
-        # Get the static base prompt from the schema
-        base_prompt = ChatPrompt().prompt
-
-        # Build the full prompt with header + body
-        full_prompt = f"{base_prompt}\nHeader: {str(header.header)}\nBody: {body.content}"
-        print(full_prompt)
-
-        # Send to OpenAI
+        full_prompt = (
+            f"{prompt.prompt}\nHeader: {header.header!s}\nBody: {body.content}"
+        )
         reply = await optional_openai.send_prompt(
             prompt=full_prompt,
-            model="gpt-3.5-turbo"
+            model=prompt.model,
         )
-
         return ChatResponse(response=reply)
-
-    except Exception as e:
+    except Exception as e:  # pragma: no cover - safety net
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error communicating with ChatGPT: {str(e)}"
-        ) 
-#Start of added code
+            detail=f"Error communicating with ChatGPT: {e!s}",
+        ) from e
