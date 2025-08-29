@@ -3,7 +3,6 @@ import { computed, type PropType } from 'vue'
 
 import Eml from '@/components/EmlItem.vue'
 import Verdicts from '@/components/verdicts/VerdictsItem.vue'
-import ChatGpt from '@/components/ChatGptItem.vue'
 import type { ResponseType } from '@/schemas'
 import { useStatusStore } from '@/store'
 
@@ -32,11 +31,6 @@ const status = computed(() => store.$state)
       </div>
     </div>
     <Verdicts :verdicts="response.verdicts" v-if="response.verdicts.length > 0" />
-    <ChatGpt
-      :header="response.eml.header"
-      :body="response.eml.bodies[0]"
-      v-if="response.eml.bodies.length > 0"
-    />
     <Eml :eml="response.eml" />
   </div>
 </template>
