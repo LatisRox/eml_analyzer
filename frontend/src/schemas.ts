@@ -126,19 +126,6 @@ export const ResponseSchema = z.object({
 
 export type ResponseType = z.infer<typeof ResponseSchema>
 
-export const ChatPromptSchema = z.object({
-  prompt: z.string(),
-  model: z.string().default('gpt-3.5-turbo')
-})
-
-export type ChatPromptType = z.infer<typeof ChatPromptSchema>
-
-export const ChatResponseSchema = z.object({
-  response: z.string()
-})
-
-export type ChatResponseType = z.infer<typeof ChatResponseSchema>
-
 export const SubmissionResultSchema = z.object({
   referenceUrl: z.string(),
   status: z.string().nullish()
