@@ -14,7 +14,8 @@ export const StatusSchema = z.object({
   vt: z.boolean().optional(),
   emailRep: z.boolean().optional(),
   inquest: z.boolean().optional(),
-  urlscan: z.boolean().optional()
+  urlscan: z.boolean().optional(),
+  openai: z.boolean().optional()
 })
 
 export type StatusType = z.infer<typeof StatusSchema>

@@ -22,5 +22,6 @@ const toClass = (b: boolean) => {
     <span class="badge" :class="toClass(status.vt || false)">VirusTotal</span>
     <span class="badge" :class="toClass(status.inquest || false)">InQuest</span>
     <span class="badge" :class="toClass(status.urlscan || false)">urlscan.io</span>
+    <span class="badge" :class="toClass(status.openai || false)">OpenAI</span>
   </div>
 </template>
