@@ -16,10 +16,11 @@ from .emailrep import EmailRepVerdictFactory
 from .eml import EmlFactory
 from .inquest import InQuestVerdictFactory
 from .oldid import OleIDVerdictFactory
+from .openai import OpenAIVerdictFactory
 from .spamassassin import SpamAssassinVerdictFactory
 from .urlscan import UrlScanVerdictFactory
 from .virustotal import VirusTotalVerdictFactory
-from .openai import OpenAIVerdictFactory
+
 
 def log_exception(exception: Exception):
     logger.exception(exception)
@@ -69,12 +70,16 @@ async def get_vt_verdict(
 ) -> schemas.Verdict:
     return await VirusTotalVerdictFactory(client).call(sha256s)
 
-#start of added code
+
+# start of added code
 @future_safe
 async def get_openai_verdict(*, client: clients.Openai) -> schemas.Verdict:
     # This calls the new OpenAIVerdictFactory (like VirusTotalVerdictFactory etc.)
+    logger.debug("Requesting OpenAI verdict")
     return await OpenAIVerdictFactory(client).call()
-#end of added code
+
+
+# end of added code
 
 
 @future_safe
@@ -87,9 +92,9 @@ async def set_verdicts(
     optional_vt: clients.VirusTotal | None = None,
     optional_urlscan: clients.UrlScan | None = None,
     optional_inquest: clients.InQuest | None = None,
-    #start of added code
+    # start of added code
     optional_openai: clients.Openai | None = None,
-    #end of added code
+    # end of added code
 ) -> schemas.Response:
     f_results: list[FutureResultE[schemas.Verdict]] = [
         get_spam_assassin_verdict(eml_file, client=spam_assassin),
@@ -107,10 +112,11 @@ async def set_verdicts(
     if optional_inquest is not None:
         f_results.append(get_inquest_verdict(response.sha256s, client=optional_inquest))
 
-    #start of added code
+    # start of added code
     if optional_openai is not None:
+        logger.debug("Adding OpenAI verdict to result set")
         f_results.append(get_openai_verdict(client=optional_openai))
-    #end of added code
+    # end of added code
 
     if optional_urlscan is not None:
         f_results.append(get_urlscan_verdict(response.urls, client=optional_urlscan))
@@ -121,6 +127,7 @@ async def set_verdicts(
         for result in results
     ]
     response.verdicts = [value for value in values if value is not None]
+    logger.debug("Verdicts ready: {}", [v.name for v in response.verdicts])
     return response
 
 
@@ -135,9 +142,9 @@ class ResponseFactory(AbstractAsyncFactory):
         optional_vt: clients.VirusTotal | None = None,
         optional_urlscan: clients.UrlScan | None = None,
         optional_inquest: clients.InQuest | None = None,
-        #start of added code
+        # start of added code
         optional_openai: clients.Openai | None = None,
-        #end of added code
+        # end of added code
     ) -> schemas.Response:
         f_result: FutureResultE[schemas.Response] = flow(
             parse(eml_file),
@@ -150,9 +157,9 @@ class ResponseFactory(AbstractAsyncFactory):
                     optional_vt=optional_vt,
                     optional_urlscan=optional_urlscan,
                     optional_inquest=optional_inquest,
-                    #start of added code
+                    # start of added code
                     optional_openai=optional_openai,
-                    #end of added code
+                    # end of added code
                 )
             ),
         )
