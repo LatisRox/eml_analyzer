@@ -23,7 +23,7 @@ dependencies = [
   "ioc-finder>=7.3.0,<8.0.0",
   "loguru>=0.7.3",
   "oletools==0.60.2",
-  "openai>=1.102.0",
+  "openai>=1.99.9",
   "pydantic>=2.11.7",
   "pyhumps>=3.8,<4.0",
   "python-dotenv>=1.1.1",

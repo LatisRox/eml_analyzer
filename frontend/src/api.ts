@@ -5,10 +5,9 @@ import { ResponseSchema, type ResponseType, StatusSchema, type StatusType } from
 const client = axios.create()
 
 export const API = {
-  async analyze(file: File, prompt: string): Promise<ResponseType> {
+  async analyze(file: File): Promise<ResponseType> {
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('prompt', prompt)
     const res = await client.post('/api/analyze/file', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'

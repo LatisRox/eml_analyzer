@@ -1,4 +1,3 @@
-from loguru import logger
 from returns.functions import raise_exception
 from returns.future import FutureResultE, future_safe
 from returns.pipeline import flow
@@ -13,14 +12,12 @@ async def send_prompt(
     *, client: clients.Openai, prompt: str, model: str | None = None
 ) -> str:
     """Send a prompt to the OpenAI API using the wrapped Openai client."""
-    logger.debug("Sending prompt through OpenAIVerdictFactory")
-    return await client.send_prompt(prompt, model=model or "gpt-5o")
+    return await client.send_prompt(prompt, model=model or "gpt-3.5-turbo")
 
 
 @future_safe
 async def transform_response(response: str, *, name: str) -> schemas.Verdict:
     """Convert the raw OpenAI string response into a Verdict schema."""
-    logger.debug("Transforming OpenAI response into Verdict")
     return schemas.Verdict(
         name=name,
         malicious=False,  # Adjust if you plan to mark based on AI output
@@ -46,12 +43,9 @@ class OpenAIVerdictFactory:
         model: str | None = None,
     ) -> schemas.Verdict:
         """Orchestrate sending the prompt and converting the result to a Verdict."""
-        logger.debug("OpenAIVerdictFactory.call started")
         f_result: FutureResultE[schemas.Verdict] = flow(
             send_prompt(client=self.client, prompt=prompt, model=model),
             bind(lambda response: transform_response(response, name=self.name)),
         )
         result = await f_result.awaitable()
-        verdict = unsafe_perform_io(result.alt(raise_exception).unwrap())
-        logger.debug("OpenAIVerdictFactory.call completed")
-        return verdict
+        return unsafe_perform_io(result.alt(raise_exception).unwrap())

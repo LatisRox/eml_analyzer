@@ -1,16 +1,14 @@
-import inspect
+import asyncio
 
 from loguru import logger
-from openai import AsyncOpenAI
+from openai import OpenAI
 from starlette.datastructures import Secret
-
-from backend import settings
 
 
 class Openai:
-    """Async client wrapper for the OpenAI Responses API."""
+    """Async-compatible client wrapper for the OpenAI ChatGPT API."""
 
-    def __init__(self, api_key: Secret, timeout: float | None = None):
+    def __init__(self, api_key: Secret):
         key = (
             api_key.get_secret_value()
             if hasattr(api_key, "get_secret_value")
@@ -20,34 +18,21 @@ class Openai:
             logger.debug("OpenAI API key is missing or empty.")
             raise ValueError("OpenAI API key is missing.")
         logger.debug("OpenAI API key loaded successfully.")
-        timeout = timeout if timeout is not None else settings.OPENAI_TIMEOUT
-        self.client = AsyncOpenAI(api_key=key, timeout=timeout)
+        self.client = OpenAI(api_key=key)
 
-    async def send_prompt(self, prompt: str, model: str | None = None) -> str:
-        """Send a prompt to OpenAI asynchronously and return the reply."""
-        model = model or settings.OPENAI_MODEL
-        logger.debug("Sending prompt to OpenAI with model `{}`", model)
-        logger.debug("Prompt content: {}", prompt)
-        completion = await self.client.responses.create(
+    async def send_prompt(self, prompt: str, model: str = "gpt-3.5-turbo") -> str:
+        """Send a prompt to ChatGPT asynchronously and return the reply."""
+        completion = await asyncio.to_thread(
+            self.client.chat.completions.create,
             model=model,
-            input=prompt,
+            messages=[{"role": "user", "content": prompt}],
         )
-        response = completion.output_text.strip()
-        logger.debug("Received response from OpenAI: {}", response)
-        return response
+        return completion.choices[0].message.content.strip()
 
     async def __aenter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        close = getattr(self.client, "aclose", None) or getattr(self.client, "close", None)
-        if close is None:
-            logger.warning("OpenAI client has no close method.")
-            return
-        try:
-            result = close()
-            if inspect.isawaitable(result):
-                await result
-        except Exception:
-            logger.exception("Failed to close OpenAI client.")
+        # No cleanup needed for the OpenAI SDK
+        pass
