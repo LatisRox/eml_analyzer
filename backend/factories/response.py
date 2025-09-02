@@ -10,6 +10,7 @@ from returns.pointfree import bind
 from returns.unsafe import unsafe_perform_io
 
 from backend import clients, schemas, types
+from backend.schemas.openai_chat import ChatPrompt
 
 from .abstract import AbstractAsyncFactory
 from .emailrep import EmailRepVerdictFactory
@@ -73,10 +74,19 @@ async def get_vt_verdict(
 
 # start of added code
 @future_safe
-async def get_openai_verdict(*, client: clients.Openai) -> schemas.Verdict:
-    # This calls the new OpenAIVerdictFactory (like VirusTotalVerdictFactory etc.)
+async def get_openai_verdict(
+    response: schemas.Response,
+    *,
+    client: clients.Openai,
+    prompt: str | None = None,
+) -> schemas.Verdict:
+    """Call OpenAI with a custom prompt and email content."""
     logger.debug("Requesting OpenAI verdict")
-    return await OpenAIVerdictFactory(client).call()
+    header_str = str(response.eml.header.header)
+    bodies_text = "\n\n".join(body.content for body in response.eml.bodies)
+    base_prompt = prompt or ChatPrompt().prompt
+    full_prompt = f"{base_prompt}\nHeader: {header_str}\nBody: {bodies_text}"
+    return await OpenAIVerdictFactory(client).call(prompt=full_prompt)
 
 
 # end of added code
@@ -94,6 +104,7 @@ async def set_verdicts(
     optional_inquest: clients.InQuest | None = None,
     # start of added code
     optional_openai: clients.Openai | None = None,
+    openai_prompt: str | None = None,
     # end of added code
 ) -> schemas.Response:
     f_results: list[FutureResultE[schemas.Verdict]] = [
@@ -115,7 +126,13 @@ async def set_verdicts(
     # start of added code
     if optional_openai is not None:
         logger.debug("Adding OpenAI verdict to result set")
-        f_results.append(get_openai_verdict(client=optional_openai))
+        f_results.append(
+            get_openai_verdict(
+                response,
+                client=optional_openai,
+                prompt=openai_prompt,
+            )
+        )
     # end of added code
 
     if optional_urlscan is not None:
@@ -144,6 +161,7 @@ class ResponseFactory(AbstractAsyncFactory):
         optional_inquest: clients.InQuest | None = None,
         # start of added code
         optional_openai: clients.Openai | None = None,
+        openai_prompt: str | None = None,
         # end of added code
     ) -> schemas.Response:
         f_result: FutureResultE[schemas.Response] = flow(
@@ -159,6 +177,7 @@ class ResponseFactory(AbstractAsyncFactory):
                     optional_inquest=optional_inquest,
                     # start of added code
                     optional_openai=optional_openai,
+                    openai_prompt=openai_prompt,
                     # end of added code
                 )
             ),
