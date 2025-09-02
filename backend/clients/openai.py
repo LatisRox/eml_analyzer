@@ -1,12 +1,10 @@
-import asyncio
-
 from loguru import logger
-from openai import OpenAI
+from openai import AsyncOpenAI
 from starlette.datastructures import Secret
 
 
 class Openai:
-    """Async-compatible client wrapper for the OpenAI ChatGPT API."""
+    """Async client wrapper for the OpenAI Responses API."""
 
     def __init__(self, api_key: Secret):
         key = (
@@ -18,18 +16,17 @@ class Openai:
             logger.debug("OpenAI API key is missing or empty.")
             raise ValueError("OpenAI API key is missing.")
         logger.debug("OpenAI API key loaded successfully.")
-        self.client = OpenAI(api_key=key)
+        self.client = AsyncOpenAI(api_key=key)
 
     async def send_prompt(self, prompt: str, model: str = "gpt-5o") -> str:
-        """Send a prompt to ChatGPT asynchronously and return the reply."""
+        """Send a prompt to OpenAI asynchronously and return the reply."""
         logger.debug("Sending prompt to OpenAI with model `{}`", model)
         logger.debug("Prompt content: {}", prompt)
-        completion = await asyncio.to_thread(
-            self.client.chat.completions.create,
+        completion = await self.client.responses.create(
             model=model,
-            messages=[{"role": "user", "content": prompt}],
+            input=prompt,
         )
-        response = completion.choices[0].message.content.strip()
+        response = completion.output_text.strip()
         logger.debug("Received response from OpenAI: {}", response)
         return response
 
