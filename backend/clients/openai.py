@@ -1,3 +1,5 @@
+import inspect
+
 from loguru import logger
 from openai import AsyncOpenAI
 from starlette.datastructures import Secret
@@ -35,5 +37,13 @@ class Openai:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        # No cleanup needed for the OpenAI SDK
-        pass
+        close = getattr(self.client, "aclose", None) or getattr(self.client, "close", None)
+        if close is None:
+            logger.warning("OpenAI client has no close method.")
+            return
+        try:
+            result = close()
+            if inspect.isawaitable(result):
+                await result
+        except Exception:
+            logger.exception("Failed to close OpenAI client.")
