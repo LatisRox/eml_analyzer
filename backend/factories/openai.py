@@ -14,7 +14,7 @@ async def send_prompt(
 ) -> str:
     """Send a prompt to the OpenAI API using the wrapped Openai client."""
     logger.debug("Sending prompt through OpenAIVerdictFactory")
-    return await client.send_prompt(prompt, model=model or "gpt-3.5-turbo")
+    return await client.send_prompt(prompt, model=model or "gpt-5o")
 
 
 @future_safe
