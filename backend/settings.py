@@ -42,6 +42,8 @@ EMAIL_REP_API_KEY: Secret | None = config(
 #start of added code
 OPENAI_API_KEY: Secret | None = config("OPENAI_API_KEY", cast=Secret, default=None)
 OPENAI_TIMEOUT: float = config("OPENAI_TIMEOUT", cast=float, default=30.0)
+OPENAI_MODEL: str = config("OPENAI_MODEL", cast=str, default="gpt-4o")
+
 #COPILOT_API_KEY: Secret | None = config("COPILOT_API_KEY", cast=Secret, default=None)
 #ANYRUN_API_KEY: Secret | None = config("ANYRUN_API_KEY", cast=Secret, default=None)
 #end of added code
