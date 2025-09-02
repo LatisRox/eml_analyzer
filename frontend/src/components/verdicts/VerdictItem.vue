@@ -10,7 +10,6 @@ const props = defineProps({
     required: true
   }
 })
-console.debug('Rendering verdict item', props.verdict)
 
 const title = computed(() => {
   return `${props.verdict.name}`

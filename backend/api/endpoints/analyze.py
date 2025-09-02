@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 from redis import Redis
@@ -19,7 +19,6 @@ async def _analyze(
     optional_urlscan: clients.UrlScan | None = None,
     #added code starts here
     optional_openai: clients.Openai | None = None,
-    openai_prompt: str | None = None,
     #optional_copilot: clients.copilot | None = None, 
     #optional_anyrun: clients.anyrun | None = None,   
     #added code ends here  
@@ -45,7 +44,6 @@ async def _analyze(
         optional_vt=optional_vt,
         #added code starts here
         optional_openai=optional_openai,
-        openai_prompt=openai_prompt,
         #optional_copilot=optional_copilot,
         #optional_anyrun=optional_anyrun,
         #added code ends here
@@ -93,7 +91,6 @@ async def analyze(
         optional_vt=optional_vt,
         #added code starts here
         optional_openai=optional_openai,
-        openai_prompt=payload.prompt,
         #optional_copilot=optional_copilot,
         #optional_anyrun=optional_anyrun,
         #added code starts here
@@ -115,7 +112,6 @@ async def analyze(
 )
 async def analyze_file(
     file: bytes = File(...),
-    prompt: str | None = Form(None),
     *,
     background_tasks: BackgroundTasks,
     optional_redis: dependencies.OptionalRedis,
@@ -139,7 +135,6 @@ async def analyze_file(
         optional_vt=optional_vt,
         #added code starts here
         optional_openai=optional_openai,
-        openai_prompt=prompt,
         #optional_copilot=optional_copilot,
         #optional_anyrun=optional_anyrun,
         #added code starts here
