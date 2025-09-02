@@ -20,7 +20,7 @@ class Openai:
         logger.debug("OpenAI API key loaded successfully.")
         self.client = OpenAI(api_key=key)
 
-    async def send_prompt(self, prompt: str, model: str = "gpt-3.5-turbo") -> str:
+    async def send_prompt(self, prompt: str, model: str = "gpt-5o") -> str:
         """Send a prompt to ChatGPT asynchronously and return the reply."""
         logger.debug("Sending prompt to OpenAI with model `{}`", model)
         logger.debug("Prompt content: {}", prompt)
