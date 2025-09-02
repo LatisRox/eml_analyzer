@@ -7,6 +7,7 @@ from .api_model import APIModel
 
 class Payload(APIModel):
     file: str
+    prompt: str | None = None
 
 
 class FilePayload(APIModel):
