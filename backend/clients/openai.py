@@ -2,6 +2,8 @@ from loguru import logger
 from openai import AsyncOpenAI
 from starlette.datastructures import Secret
 
+from backend import settings
+
 
 class Openai:
     """Async client wrapper for the OpenAI Responses API."""
@@ -18,8 +20,9 @@ class Openai:
         logger.debug("OpenAI API key loaded successfully.")
         self.client = AsyncOpenAI(api_key=key)
 
-    async def send_prompt(self, prompt: str, model: str = "gpt-5o") -> str:
+    async def send_prompt(self, prompt: str, model: str | None = None) -> str:
         """Send a prompt to OpenAI asynchronously and return the reply."""
+        model = model or settings.OPENAI_MODEL
         logger.debug("Sending prompt to OpenAI with model `{}`", model)
         logger.debug("Prompt content: {}", prompt)
         completion = await self.client.responses.create(
