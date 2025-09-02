@@ -4,12 +4,13 @@ import { type PropType } from 'vue'
 import Verdict from '@/components/verdicts/VerdictItem.vue'
 import type { VerdictType } from '@/schemas'
 
-defineProps({
+const props = defineProps({
   verdicts: {
     type: Array as PropType<VerdictType[]>,
     required: true
   }
 })
+console.debug('Received verdicts in component', props.verdicts)
 </script>
 
 <template>

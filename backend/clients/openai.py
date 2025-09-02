@@ -22,12 +22,16 @@ class Openai:
 
     async def send_prompt(self, prompt: str, model: str = "gpt-3.5-turbo") -> str:
         """Send a prompt to ChatGPT asynchronously and return the reply."""
+        logger.debug("Sending prompt to OpenAI with model `{}`", model)
+        logger.debug("Prompt content: {}", prompt)
         completion = await asyncio.to_thread(
             self.client.chat.completions.create,
             model=model,
             messages=[{"role": "user", "content": prompt}],
         )
-        return completion.choices[0].message.content.strip()
+        response = completion.choices[0].message.content.strip()
+        logger.debug("Received response from OpenAI: {}", response)
+        return response
 
     async def __aenter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
