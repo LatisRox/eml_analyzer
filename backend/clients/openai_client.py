@@ -1,7 +1,9 @@
-import asyncio
+"""Async OpenAI client wrapper."""
 
 from loguru import logger
-from openai import OpenAI
+import httpx
+import openai
+from openai import AsyncOpenAI
 from starlette.datastructures import Secret
 
 
@@ -18,7 +20,7 @@ class Openai:
             logger.debug("OpenAI API key is missing or empty.")
             raise ValueError("OpenAI API key is missing.")
         logger.debug("OpenAI API key loaded successfully.")
-        self.client = OpenAI(api_key=key)
+        self.client = AsyncOpenAI(api_key=key)
 
     async def send_prompt(self, prompt: str, model: str = "gpt-4o-mini") -> str:
         """Send a prompt asynchronously and return the text response."""
@@ -27,17 +29,22 @@ class Openai:
             len(prompt),
             model,
         )
-        response = self.client.responses.create(
-            model=model,
-            input=prompt,
-            store=True,
-        )
+        try:
+            response = await self.client.responses.create(
+                model=model,
+                input=prompt,
+                store=True,
+                timeout=30,
+            )
+        except (openai.Timeout, httpx.TimeoutException) as exc:
+            raise RuntimeError("OpenAI request timed out") from exc
+
         text = (response.output_text or "").strip()
         logger.debug(
             "OpenAI client: received response (len={})",
             len(text),
         )
-        return (response.output_text)
+        return response.output_text
 
     async def __aenter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
