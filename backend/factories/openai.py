@@ -3,6 +3,7 @@ from returns.future import FutureResultE, future_safe
 from returns.pipeline import flow
 from returns.pointfree import bind
 from returns.unsafe import unsafe_perform_io
+from loguru import logger
 
 from backend import clients, schemas
 
@@ -11,8 +12,25 @@ from backend import clients, schemas
 async def send_prompt(
     *, client: clients.Openai, prompt: str, model: str | None = None
 ) -> str:
-    """Send a prompt to the OpenAI API using the wrapped Openai client."""
-    return await client.send_prompt(prompt, model=model or "gpt-4o-mini")
+    """Send a prompt to the OpenAI API using the wrapped Openai client.
+
+    Notes:
+    - The API key is loaded securely by the OpenAI client (see
+      `backend/clients/openai_client.py`). We only pass the prompt/model here.
+    - Debug logs indicate when we send the prompt and when a response arrives.
+    """
+    chosen_model = model or "gpt-4o-mini"
+    logger.debug(
+        "OpenAI send_prompt: sending prompt (len={}, model={})",
+        len(prompt),
+        chosen_model,
+    )
+    response_text = await client.send_prompt(prompt, model=chosen_model)
+    logger.debug(
+        "OpenAI send_prompt: received response (len={})",
+        len(response_text or ""),
+    )
+    return response_text
 
 
 @future_safe

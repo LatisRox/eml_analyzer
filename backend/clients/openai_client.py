@@ -22,13 +22,23 @@ class Openai:
 
     async def send_prompt(self, prompt: str, model: str = "gpt-4o-mini") -> str:
         """Send a prompt asynchronously and return the text response."""
+        logger.debug(
+            "OpenAI client: dispatching prompt (len={}, model={})",
+            len(prompt),
+            model,
+        )
         response = await asyncio.to_thread(
             self.client.responses.create,
             model=model,
             input=prompt,
             store=True,
         )
-        return response.output_text.strip()
+        text = (response.output_text or "").strip()
+        logger.debug(
+            "OpenAI client: received response (len={})",
+            len(text),
+        )
+        return text
 
     async def __aenter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
