@@ -72,13 +72,13 @@ async def submit_to_virustotal(
         ) from e
 
 
-# Added ChatGPT endpoint for sending custom prompts
+# Endpoint for sending custom prompts to OpenAI
 @router.post(
     "/chatgpt",
     response_model=ChatResponse,
-    response_description="Return a ChatGPT response",
-    summary="Send a custom prompt to ChatGPT",
-    description="Send a prompt to the OpenAI ChatGPT API and get the response",
+    response_description="Return an OpenAI response",
+    summary="Send a custom prompt to OpenAI",
+    description="Send a prompt to the OpenAI Responses API and get the response",
     status_code=status.HTTP_200_OK,
 )
 async def send_to_chatgpt(
@@ -105,5 +105,5 @@ async def send_to_chatgpt(
     except Exception as e:  # pragma: no cover - safety net
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error communicating with ChatGPT: {e!s}",
+            detail=f"Error communicating with OpenAI: {e!s}",
         ) from e
