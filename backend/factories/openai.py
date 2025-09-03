@@ -12,7 +12,7 @@ async def send_prompt(
     *, client: clients.Openai, prompt: str, model: str | None = None
 ) -> str:
     """Send a prompt to the OpenAI API using the wrapped Openai client."""
-    return await client.send_prompt(prompt, model=model or "gpt-3.5-turbo")
+    return await client.send_prompt(prompt, model=model or "gpt-4o-mini")
 
 
 @future_safe
