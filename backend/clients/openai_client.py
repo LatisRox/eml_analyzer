@@ -1,12 +1,12 @@
 from loguru import logger
 import httpx
 import openai
-from openai import AsyncOpenAI
+from openai import OpenAI
 from starlette.datastructures import Secret
 
 
 class Openai:
-    """Async-compatible wrapper around the OpenAI Responses API."""
+    """Synchronous wrapper around the OpenAI Responses API."""
 
     def __init__(self, api_key: Secret):
         key = (
@@ -18,17 +18,17 @@ class Openai:
             logger.debug("OpenAI API key is missing or empty.")
             raise ValueError("OpenAI API key is missing.")
         logger.debug("OpenAI API key loaded successfully.")
-        self.client = AsyncOpenAI(api_key=key)
+        self.client = OpenAI(api_key=key)
 
-    async def send_prompt(self, prompt: str, model: str = "gpt-4o-mini") -> str:
-        """Send a prompt asynchronously and return the text response."""
+    def send_prompt(self, prompt: str, model: str = "gpt-4o-mini") -> str:
+        """Send a prompt and return the text response."""
         logger.debug(
             "OpenAI client: dispatching prompt (len={}, model={})",
             len(prompt),
             model,
         )
         try:
-            response = await self.client.responses.create(
+            response = self.client.responses.create(
                 model=model,
                 input=prompt,
                 store=True,
@@ -48,10 +48,10 @@ class Openai:
 
         return response.output_text
 
-    async def __aenter__(self) -> "Openai":
+    def __enter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
         return self
 
-    async def __aexit__(self, exc_type, exc, tb) -> None:
+    def __exit__(self, exc_type, exc, tb) -> None:
         # No cleanup needed for the OpenAI SDK
         pass
