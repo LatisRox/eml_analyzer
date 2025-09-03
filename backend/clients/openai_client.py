@@ -1,6 +1,6 @@
-from loguru import logger
 import httpx
 import openai
+from loguru import logger
 from openai import OpenAI
 from starlette.datastructures import Secret
 
@@ -46,7 +46,8 @@ class Openai:
         truncated = text[:200] + ("..." if len(text) > 200 else "")
         logger.debug("OpenAI client: response text: {}", truncated)
 
-        return response.output_text
+        # Always return the processed text to avoid propagating ``None`` values
+        return text
 
     def __enter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
