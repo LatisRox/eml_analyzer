@@ -1,5 +1,3 @@
-import asyncio
-
 from loguru import logger
 from openai import OpenAI
 from starlette.datastructures import Secret
@@ -37,7 +35,9 @@ class Openai:
             "OpenAI client: received response (len={})",
             len(text),
         )
-        return (response.output_text)
+        truncated = text[:200] + ("..." if len(text) > 200 else "")
+        logger.debug("OpenAI client: response text: {}", truncated)
+        return response.output_text
 
     async def __aenter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
