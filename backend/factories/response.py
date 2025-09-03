@@ -16,10 +16,11 @@ from .emailrep import EmailRepVerdictFactory
 from .eml import EmlFactory
 from .inquest import InQuestVerdictFactory
 from .oldid import OleIDVerdictFactory
+from .openai import OpenAIVerdictFactory
 from .spamassassin import SpamAssassinVerdictFactory
 from .urlscan import UrlScanVerdictFactory
 from .virustotal import VirusTotalVerdictFactory
-from .openai import OpenAIVerdictFactory
+
 
 def log_exception(exception: Exception):
     logger.exception(exception)
@@ -71,9 +72,10 @@ async def get_vt_verdict(
 
 #start of added code
 @future_safe
-async def get_openai_verdict(*, client: clients.Openai) -> schemas.Verdict:
-    # This calls the new OpenAIVerdictFactory (like VirusTotalVerdictFactory etc.)
-    return await OpenAIVerdictFactory(client).call()
+async def get_openai_verdict(
+    eml: schemas.Eml, *, client: clients.Openai
+) -> schemas.Verdict:
+    return await OpenAIVerdictFactory(client).call(eml=eml)
 #end of added code
 
 
@@ -109,7 +111,7 @@ async def set_verdicts(
 
     #start of added code
     if optional_openai is not None:
-        f_results.append(get_openai_verdict(client=optional_openai))
+        f_results.append(get_openai_verdict(response.eml, client=optional_openai))
     #end of added code
 
     if optional_urlscan is not None:
