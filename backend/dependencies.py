@@ -53,19 +53,19 @@ async def _get_optional_inquest(api_key: Secret | None = settings.INQUEST_API_KE
 
 
 # Start of added code
-@asynccontextmanager
-async def _get_optional_openai(api_key: Secret | None = settings.OPENAI_API_KEY):
+@contextmanager
+def _get_optional_openai(api_key: Secret | None = settings.OPENAI_API_KEY):
     if api_key is None:
         logger.debug("OpenAI API key not provided.")
         yield None
     else:
         logger.debug("OpenAI API key loaded.")
-        async with clients.Openai(api_key=api_key) as client:
+        with clients.Openai(api_key=api_key) as client:
             yield client
 
 
-async def get_optional_openai():
-    async with _get_optional_openai(settings.OPENAI_API_KEY) as client:
+def get_optional_openai():
+    with _get_optional_openai(settings.OPENAI_API_KEY) as client:
         yield client
 
 

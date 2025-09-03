@@ -1,3 +1,4 @@
+import asyncio
 import httpx
 from fastapi import APIRouter, HTTPException, status
 
@@ -94,10 +95,9 @@ async def send_to_chatgpt(
         )
 
     try:
-        full_prompt = (
-            f"{prompt.prompt}\nHeader: {header.header!s}\nBody: {body.content}"
-        )
-        reply = await optional_openai.send_prompt(
+        full_prompt = f"{prompt.prompt}\nBody: {body.content}"
+        reply = await asyncio.to_thread(
+            optional_openai.send_prompt,
             prompt=full_prompt,
             model=prompt.model,
         )
