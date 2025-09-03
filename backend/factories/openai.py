@@ -1,4 +1,5 @@
 import asyncio
+
 from loguru import logger
 from returns.functions import raise_exception
 from returns.future import FutureResultE, future_safe
@@ -42,7 +43,8 @@ async def send_prompt(
     if response_text and len(response_text) > 200:
         truncated += "..."
     logger.debug("OpenAI send_prompt: received response: {}", truncated)
-    return response_text
+    # Ensure a string is always returned for downstream processing
+    return response_text or ""
 
 
 @future_safe
