@@ -1,5 +1,3 @@
-"""Async OpenAI client wrapper."""
-
 from loguru import logger
 import httpx
 import openai
@@ -44,6 +42,10 @@ class Openai:
             "OpenAI client: received response (len={})",
             len(text),
         )
+
+        truncated = text[:200] + ("..." if len(text) > 200 else "")
+        logger.debug("OpenAI client: response text: {}", truncated)
+
         return response.output_text
 
     async def __aenter__(self) -> "Openai":

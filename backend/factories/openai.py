@@ -1,9 +1,9 @@
+from loguru import logger
 from returns.functions import raise_exception
 from returns.future import FutureResultE, future_safe
 from returns.pipeline import flow
 from returns.pointfree import bind
 from returns.unsafe import unsafe_perform_io
-from loguru import logger
 
 from backend import clients, schemas
 
@@ -25,11 +25,20 @@ async def send_prompt(
         len(prompt),
         chosen_model,
     )
-    response_text = await client.send_prompt(prompt, model=chosen_model)
-    logger.debug(
-        "OpenAI send_prompt: received response (len={})",
-        len(response_text or ""),
-    )
+    try:
+        response_text = await client.send_prompt(prompt, model=chosen_model)
+    except Exception as e:
+        # Log the exception and any partial response the SDK might provide
+        logger.exception("OpenAI send_prompt: error while sending prompt")
+        partial = getattr(e, "response", None)
+        if partial is not None:
+            logger.error("OpenAI send_prompt: partial response: {}", partial)
+        raise
+
+    truncated = (response_text or "")[:200]
+    if response_text and len(response_text) > 200:
+        truncated += "..."
+    logger.debug("OpenAI send_prompt: received response: {}", truncated)
     return response_text
 
 
