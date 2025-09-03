@@ -27,8 +27,7 @@ class Openai:
             len(prompt),
             model,
         )
-        response = await asyncio.to_thread(
-            self.client.responses.create,
+        response = self.client.responses.create(
             model=model,
             input=prompt,
             store=True,
@@ -38,7 +37,7 @@ class Openai:
             "OpenAI client: received response (len={})",
             len(text),
         )
-        return text
+        return (response.output_text)
 
     async def __aenter__(self) -> "Openai":
         # No persistent connection to manage, but we keep the pattern
