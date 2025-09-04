@@ -1,6 +1,6 @@
 version = 1
 revision = 2
-requires-python = ">=3.11, <3.13"
+requires-python = ">=3.12, <3.13"
 resolution-markers = [
     "platform_python_implementation != 'PyPy'",
     "platform_python_implementation == 'PyPy'",
@@ -1893,3 +1893,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/34/45/0e055320daaabfc169b21ff6174567b2c910c45617b0d79c68d7ab349b02/yarl-1.18.3-cp312-cp312-win_amd64.whl", hash = "sha256:7e2ee16578af3b52ac2f334c3b1f92262f47e02cc6193c598502bd46f5cd1477", size = 90399, upload-time = "2024-12-01T20:34:09.61Z" },
     { url = "https://files.pythonhosted.org/packages/f5/4b/a06e0ec3d155924f77835ed2d167ebd3b211a7b0853da1cf8d8414d784ef/yarl-1.18.3-py3-none-any.whl", hash = "sha256:b57f4f58099328dfb26c6a771d09fb20dbbae81d20cfb66141251ea063bd101b", size = 45109, upload-time = "2024-12-01T20:35:20.834Z" },
 ]
+
+[[package]]
+name = "openai"
+version = "1.105.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = []
+sdist = { url = "https://files.pythonhosted.org/packages/openai-1.105.0.tar.gz", hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000", size = 0, upload-time = "1970-01-01T00:00:00Z" }
+wheels = []
+
