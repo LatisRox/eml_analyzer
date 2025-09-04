@@ -45,6 +45,10 @@ defineProps({
           </div>
         </td>
       </tr>
+      <tr v-if="body.haiku">
+        <th class="w-80">Haiku</th>
+        <td>{{ body.haiku }}</td>
+      </tr>
       <tr v-if="body.ipAddresses.length > 0">
         <th class="w-80">Extracted IPv4s</th>
         <td>

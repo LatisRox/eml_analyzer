@@ -5,6 +5,8 @@ from redis import Redis
 
 from backend import clients, dependencies, schemas, settings
 from backend.factories.response import ResponseFactory
+from backend.haiku import generate_haiku
+import asyncio
 
 router = APIRouter()
 
@@ -35,7 +37,7 @@ async def _analyze(
             detail=jsonable_encoder(exc.errors()),
         ) from exc
 
-    return await ResponseFactory.call(
+    response = await ResponseFactory.call(
         payload.file,
         optional_email_rep=optional_email_rep,
         spam_assassin=spam_assassin,
@@ -48,6 +50,13 @@ async def _analyze(
         #optional_anyrun=optional_anyrun,
         #added code ends here
     )
+
+    haiku = await asyncio.to_thread(generate_haiku)
+    if haiku:
+        for body in response.eml.bodies:
+            body.haiku = haiku
+
+    return response
 
 
 def cache_response(
