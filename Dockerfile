@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv sync
+RUN uv sync --frozen
 
 # main
 FROM python:3.11-slim-bookworm
