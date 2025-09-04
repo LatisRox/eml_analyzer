@@ -32,6 +32,7 @@ class Body(APIModel):
     emails: list[str]
     domains: list[str]
     ip_addresses: list[str]
+    haiku: str | None = None
 
 
 class Received(APIModel):
