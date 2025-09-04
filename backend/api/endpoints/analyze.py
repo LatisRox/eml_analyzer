@@ -106,6 +106,10 @@ async def analyze(
         optional_vt=optional_vt,
     )
 
+    plaintext_body = get_plaintext_body(response.eml)
+    if settings.DEBUG:
+        logger.debug("Plaintext body length: {}", len(plaintext_body))
+
     if optional_redis is not None:
         background_tasks.add_task(
             cache_response, redis=optional_redis, response=response
