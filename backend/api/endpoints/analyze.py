@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from redis import Redis
 
 from backend import clients, dependencies, schemas, settings
+from backend.factories.eml import EmlFactory
 from backend.factories.response import ResponseFactory
 
 router = APIRouter()
@@ -69,6 +70,14 @@ def cache_response(
 ):
     ex = expire if expire > 0 else None
     redis.set(f"{key_prefix}:{response.id}", value=response.model_dump_json(), ex=ex)
+
+
+def get_plaintext_body(eml: schemas.Eml) -> str:
+    for body in eml.bodies:
+        content_type = body.content_type or ""
+        if content_type.startswith("text/plain"):
+            return body.content
+    return ""
 
 
 @router.post(
@@ -137,3 +146,21 @@ async def analyze_file(
         )
 
     return response
+
+
+@router.post(
+    "/body",
+    response_description="Return the plaintext body of an eml",
+    summary="Get plaintext body",
+    description="Return the plaintext body from an eml without additional analysis",
+)
+async def analyze_body(payload: schemas.Payload) -> dict[str, str]:
+    try:
+        file_payload = schemas.FilePayload(file=payload.file.encode())
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=jsonable_encoder(exc.errors()),
+        ) from exc
+    eml = EmlFactory().call(file_payload.file)
+    return {"body": get_plaintext_body(eml)}
