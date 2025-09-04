@@ -30,3 +30,10 @@ def test_analyze_file_with_invalid_file(client: TestClient):
     data = {"file": b""}
     response = client.post("/api/analyze/file", files=data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_analyze_plaintext_body(client: TestClient, sample_eml: bytes):
+    payload = {"file": sample_eml.decode()}
+    response = client.post("/api/analyze/body", json=payload)
+    json = response.json()
+    assert "Lorem ipsum dolor sit amet" in json.get("body", "")
