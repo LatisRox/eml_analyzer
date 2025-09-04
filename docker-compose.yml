@@ -20,7 +20,7 @@ services:
       context: ./
       dockerfile: app.Dockerfile
     ports:
-      - ${PORT:-8000}:8000
+      - ${PORT:-8010}:8000
     environment:
       - SPAMASSASSIN_HOST=spamassassin
       - SPAMASSASSIN_PORT=${SPAMASSASSIN_PORT:-783}
