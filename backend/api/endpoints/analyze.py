@@ -1,5 +1,9 @@
+import os
+
 from fastapi import APIRouter, BackgroundTasks, File, HTTPException, status
 from fastapi.encoders import jsonable_encoder
+from loguru import logger
+from openai import OpenAI
 from pydantic import ValidationError
 from redis import Redis
 
@@ -26,7 +30,7 @@ async def _analyze(
             detail=jsonable_encoder(exc.errors()),
         ) from exc
 
-    return await ResponseFactory.call(
+    response = await ResponseFactory.call(
         payload.file,
         optional_email_rep=optional_email_rep,
         spam_assassin=spam_assassin,
@@ -34,6 +38,27 @@ async def _analyze(
         optional_urlscan=optional_urlscan,
         optional_vt=optional_vt,
     )
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        try:
+            client = OpenAI(api_key=api_key)
+            logger.debug("Requesting OpenAI response")
+            ai_response = client.responses.create(
+                model="gpt-4o-mini",
+                input="write a haiku about ai",
+                store=True,
+            )
+            if settings.DEBUG:
+                logger.debug("OpenAI response: {}", ai_response.output_text)
+            for body in response.eml.bodies:
+                body.ai_text = ai_response.output_text
+        except Exception as exc:
+            logger.debug("OpenAI request failed: {}", exc)
+    else:
+        logger.debug("OPENAI_API_KEY not set; skipping OpenAI call")
+
+    return response
 
 
 def cache_response(

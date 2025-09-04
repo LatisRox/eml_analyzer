@@ -56,7 +56,8 @@ export const BodySchema = z.object({
   urls: z.array(z.string()),
   emails: z.array(z.string()),
   domains: z.array(z.string()),
-  ipAddresses: z.array(z.string())
+  ipAddresses: z.array(z.string()),
+  aiText: z.string().nullish()
 })
 
 export type BodyType = z.infer<typeof BodySchema>
